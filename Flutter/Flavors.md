@@ -1,648 +1,287 @@
-# Guia Completo — Mason + Flutter
-
-Este documento consolida **tudo o que foi construído até agora** sobre o uso do **Mason no Flutter**, desde o básico até um **setup profissional com arquitetura, CI e Git hooks**. A ideia é servir como **material de estudo e referência**.
-
----
-
-## 1. O que é Mason
-
-**Mason** é uma ferramenta CLI em Dart usada para **gerar código a partir de templates reutilizáveis (bricks)**.
-
-Ele resolve problemas clássicos de projetos Flutter:
-
-- Copy/paste excessivo
-- Inconsistência de arquitetura
-- Nomes errados de arquivos e classes
-- Features criadas de formas diferentes por cada dev
-
-Com Mason:
-
-- Código nasce padronizado
-- Arquitetura é imposta
-- Times escalam sem virar caos
-
----
-
-## 2. Conceitos Fundamentais
-
-Conceito
-
-Descrição
-
-mason_cli
-
-CLI que executa os comandos
-
-brick
-
-Template reutilizável
-
-brick.yaml
-
-Configuração do brick
-
-mason.yaml
-
-Registro de bricks no projeto
-
-**brick**
-
-Pasta com os arquivos template
-
-Mustache
-
-Sintaxe de variáveis ({{ }})
-
-Transformações comuns:
-
-- camelCase
-- pascalCase
-- snakeCase
-- kebabCase
-
----
-
-## 3. Setup Inicial
-
-### Instalação
-
-```bash
-dart pub global activate mason_cli
-
-```
-
-### Inicializar Mason no projeto Flutter
-
-```bash
-mason init
-
-```
-
-Cria o arquivo `mason.yaml`.
-
----
-
-## 4. Brick de Feature MVVM (base)
-
-### Objetivo
-
-Gerar automaticamente:
-
-```
-lib/features/login/
-├── view/
-│   └── login_page.dart
-├── viewmodel/
-│   └── login_viewmodel.dart
-├── model/
-│   └── login_state.dart
-└── login_module.dart
-
-```
-
-### brick.yaml
-
-```yaml
-name: feature_mvvm
-description: Cria uma feature Flutter usando MVVM
-
-vars:
-  feature_name:
-    type: string
-    prompt: Feature name?
-```
-
-### Responsabilidades
-
-- View: UI pura
-- ViewModel: lógica + estado
-- Model: estado imutável
-- Module: ponto de entrada da feature
-
----
-
-## 5. Arquitetura Real de Projeto (Clean Architecture pragmática)
-
-### Estrutura global
-
-```
-lib/
-├── app/
-├── core/
-├── features/
-└── main.dart
-
-```
-
-### Regra de ouro
-
-> Nenhuma feature conhece outra feature.
-
-Código compartilhado vai para `core/`.
-
----
-
-## 6. Estrutura de uma Feature (Clean)
-
-```
-features/login/
-├── data/
-│   ├── datasources/
-│   ├── models/
-│   └── repositories/
-│
-├── domain/
-│   ├── entities/
-│   ├── repositories/
-│   └── usecases/
-│
-└── presentation/
-    ├── pages/
-    ├── viewmodel/
-    └── widgets/
-
-```
-
-### Domain
-
-- Não conhece Flutter
-- Não conhece HTTP
-- Apenas regras de negócio
-
-### Data
-
-- Implementa repositories
-- Converte DTO → Entity
-- Conhece API, JSON, Firebase etc.
-
-### Presentation
-
-- UI
-- ViewModel
-- Consome UseCases
-
----
-
-## 7. Dependency Injection (manual e simples)
-
-`app/di.dart`
-
-- Monta datasources
-- Monta repositories
-- Monta usecases
-- Entrega ViewModels prontos
-
-Benefício:
-
-- Fácil de testar
-- Fácil de trocar implementação
-
----
-
-## 8. Mason como Regra do Projeto
-
-### Convenção de time
-
-```md
-Toda feature deve ser criada via Mason.
-Criar feature manualmente é proibido.
-```
-
-Isso garante:
-
-- Estrutura consistente
-- Menos bugs
-- Menos review de organização
-
----
-
-## 9. Hooks do Mason
-
-### Pre-gen (validação)
-
-Usado para:
-
-- Validar nome da feature
-- Impedir snake_case inválido
-- Bloquear geração errada
-
-### Post-gen
-
-Usado para:
-
-- Rodar dart format
-- Ajustar arquivos
-- Executar scripts
-
-Hooks = primeira linha de defesa.
-
----
-
-## 10. Git Hooks
-
-### pre-commit
-
-Executado antes do commit:
-
-- flutter analyze
-- flutter test
-
-Benefício:
-
-- Código quebrado não entra no repo
-- Erros são resolvidos localmente
-
----
-
-## 11. CI com GitHub Actions
-
-Pipeline básico:
-
-- checkout
-- flutter pub get
-- mason get
-- flutter analyze
-- flutter test
-
-CI garante:
-
-- Qualidade contínua
-- Padrão validado no servidor
-- PR só entra se estiver correto
-
----
-
-## 12. Proteção de Arquitetura no CI
-
-Scripts simples podem:
-
-- Bloquear imports errados
-- Impedir camada presentation acessando data
-
-Isso transforma arquitetura em **regra técnica**, não opinião.
-
----
-
-## 13. Papel de Cada Camada de Controle
-
-Camada
-
-Função
-
-Mason
-
-Gera estrutura correta
-
-Hooks
-
-Validação local
-
-Git Hooks
-
-Bloqueio antes do commit
-
-CI
-
-Qualidade contínua
-
-Review
-
-Regra de negócio
-
----
-
-## 14. Resultado Final
-
-Você passa a ter:
-
-- Arquitetura previsível
-- Código consistente
-- Onboarding rápido
-- Escalabilidade real
-- Menos bugs estruturais
-
-Esse setup é usado em **times grandes e projetos de longa duração**.
-
----
-
-## 15. Próximos Estudos (opcional)
-
-- Bricks com testes automáticos
-- Bricks com GoRouter
-- Versionamento de bricks em repo separado
-- Monorepo Flutter + Mason
-
----
-
-Fim do guia.
-
-# Flutter Flavors – Guia Completo (Step by Step + Babysteps)
-
-Este documento explica **de forma exaustiva** o que são **Flavors em Flutter**, por que usar, e como implementar **passo a passo**, cobrindo **Dart, Android e iOS**, com exemplos práticos.
-
----
+# Flavors em Flutter — Guia Completo (Conceito + Implementação em Baby Steps)
 
 ## 1. O que são Flavors em Flutter
 
-**Flavors** permitem criar **múltiplas variações do mesmo aplicativo**, usando **um único código-base**.
+Flavors são variações do mesmo aplicativo Flutter, geradas a partir de um único código-base, mas com **configurações diferentes** por ambiente ou contexto, como:
 
-Cada flavor pode ter:
+- dev / hml / prod
+- cliente A / cliente B (white label)
+- builds internos vs builds de loja
 
-- Ambiente diferente (dev / hml / prod)
-- Base URL diferente
-- Nome do app diferente
-- Ícone diferente
-- Firebase diferente
-- BundleId / ApplicationId diferente
-
-> Pense em flavors como "personalidades" do app.
+Em Flutter, flavors não são um recurso nativo do Dart. Eles são a **combinação de configurações nativas (Android e iOS)** + uma forma de **informar o ambiente para o código Dart**.
 
 ---
 
-## 2. As duas camadas dos Flavors
+## 2. Quando usar (e quando não usar)
 
-### 2.1 Camada Flutter (Dart)
+### Use flavors quando:
 
-Controla comportamento em **runtime**:
+- Você precisa de **applicationId / bundleId diferentes**
+- Quer instalar **dev e prod no mesmo celular**
+- Usa **Firebase separado por ambiente**
+- Precisa de **ícones, nomes ou comportamentos diferentes**
+- Trabalha com CI/CD e múltiplos ambientes
 
-- URLs
-- Flags
-- Features
-- Logs
+### Evite flavors quando:
 
-### 2.2 Camada Nativa
-
-Controla identidade do app:
-
-- Android: `productFlavors` (Gradle)
-- iOS: `Schemes` + `Build Configurations`
+- A diferença é apenas uma URL facilmente controlável via backend
+- O comportamento deveria mudar via **feature flag dinâmica**
+- Não há diferença nativa entre os builds
 
 ---
 
-## 3. Estrutura final esperada
+## 3. O que normalmente muda por flavor
 
-```text
-lib/
- ├─ env/
- │   ├─ app_env.dart
- │   └─ env.dart
- ├─ main_dev.dart
- ├─ main_prod.dart
- └─ app.dart
-```
+### Nativo
 
----
+- ApplicationId / Bundle Identifier
+- Nome do app
+- Ícone
+- Firebase (Analytics, Crashlytics, etc.)
+- URL Schemes, entitlements
 
-## 4. Implementação no Flutter (Dart)
+### Dart / Flutter
 
-### 4.1 Criar enum de Flavor
-
-```dart
-enum Flavor { dev, prod }
-```
+- Base URL de APIs
+- Flags (logs, mocks, debug menu)
+- Chaves de integração (com cuidado)
+- Comportamentos específicos por ambiente
 
 ---
 
-### 4.2 Criar classe de ambiente
+## 4. Como o Flutter “descobre” o flavor
 
-```dart
-class AppEnv {
-  final Flavor flavor;
-  final String appName;
+As abordagens mais comuns:
+
+1. `--dart-define` (recomendado)
+2. Múltiplos `main_*.dart`
+3. Arquivos de configuração externos
+
+Este guia usa **`--dart-define`**, por ser simples e compatível com CI/CD.
+
+---
+
+## 5. Baby Steps — Implementação
+
+---
+
+## Baby Step 0 — Preparação
+
+- Garanta que o app roda:
+
+```bash
+flutter run
+
+Identifique:
+
+Android: applicationId
+
+iOS: Bundle Identifier
+
+Baby Step 1 — Conceito de ambiente no Dart
+Criar lib/app_env.dart
+enum AppEnv { dev, hml, prod }
+
+
+class EnvConfig {
+  final AppEnv env;
   final String baseUrl;
+  final bool enableLogs;
 
-  const AppEnv({
-    required this.flavor,
-    required this.appName,
+
+  const EnvConfig({
+    required this.env,
     required this.baseUrl,
+    required this.enableLogs,
   });
 }
-```
 
----
 
-### 4.3 Criar holder global
+AppEnv _parseEnv(String raw) {
+  switch (raw.toLowerCase()) {
+    case 'dev':
+      return AppEnv.dev;
+    case 'hml':
+    case 'stg':
+    case 'staging':
+      return AppEnv.hml;
+    default:
+      return AppEnv.prod;
+  }
+}
 
-```dart
+
 class Env {
-  static late AppEnv current;
-}
-```
+  static const _flavor =
+      String.fromEnvironment('FLAVOR', defaultValue: 'prod');
+  static const _baseUrl =
+      String.fromEnvironment('BASE_URL', defaultValue: 'https://api.seuapp.com');
 
----
 
-### 4.4 Criar entrypoint DEV
-
-```dart
-void main() {
-  Env.current = const AppEnv(
-    flavor: Flavor.dev,
-    appName: 'MeuApp (Dev)',
-    baseUrl: 'https://api-dev.exemplo.com',
+  static final config = EnvConfig(
+    env: _parseEnv(_flavor),
+    baseUrl: _baseUrl,
+    enableLogs: _flavor != 'prod',
   );
-
+}
+Usar no main.dart
+void main() {
+  debugPrint('FLAVOR=${Env.config.env}');
+  debugPrint('BASE_URL=${Env.config.baseUrl}');
   runApp(const MyApp());
 }
-```
-
----
-
-### 4.5 Criar entrypoint PROD
-
-```dart
-void main() {
-  Env.current = const AppEnv(
-    flavor: Flavor.prod,
-    appName: 'MeuApp',
-    baseUrl: 'https://api.exemplo.com',
-  );
-
-  runApp(const MyApp());
-}
-```
-
----
-
-### 4.6 Usar no app
-
-```dart
-MaterialApp(
-  title: Env.current.appName,
-)
-```
-
----
-
-## 5. Android – Configurando productFlavors
-
-### 5.1 build.gradle
-
-```gradle
+Rodar com defines
+flutter run \
+  --dart-define=FLAVOR=dev \
+  --dart-define=BASE_URL=https://dev-api.seuapp.com
+Baby Step 2 — Android: Product Flavors
+Em android/app/build.gradle
 flavorDimensions "env"
+
 
 productFlavors {
     dev {
         dimension "env"
         applicationIdSuffix ".dev"
         versionNameSuffix "-dev"
-        resValue "string", "app_name", "MeuApp (Dev)"
+        resValue "string", "app_name", "SeuApp DEV"
     }
-
+    hml {
+        dimension "env"
+        applicationIdSuffix ".hml"
+        versionNameSuffix "-hml"
+        resValue "string", "app_name", "SeuApp HML"
+    }
     prod {
         dimension "env"
-        resValue "string", "app_name", "MeuApp"
+        resValue "string", "app_name", "SeuApp"
     }
 }
-```
+Rodar
+flutter run --flavor dev \
+  --dart-define=FLAVOR=dev \
+  --dart-define=BASE_URL=https://dev-api.seuapp.com
+Baby Step 3 — Android: Nome e ícone por flavor
+Nome do app
 
----
+Em strings.xml:
 
-### 5.2 AndroidManifest.xml
+<string name="app_name">${app_name}</string>
+Ícones por flavor
 
-```xml
-<application
-    android:label="@string/app_name" />
-```
+Pastas:
 
----
-
-### 5.3 Rodar Android
-
-```bash
-flutter run --flavor dev -t lib/main_dev.dart
-flutter run --flavor prod -t lib/main_prod.dart
-```
-
----
-
-## 6. iOS – Schemes e Configurations
-
-### 6.1 Criar Configurations
-
-- Debug-Dev
-- Debug-Prod
-- Release-Dev
-- Release-Prod
-
----
-
-### 6.2 Criar Schemes
-
-- dev → Debug-Dev / Release-Dev
-- prod → Debug-Prod / Release-Prod
-
----
-
-### 6.3 Bundle Identifier por flavor
-
-#### Debug-Dev.xcconfig
-
-```xcconfig
-#include "Debug.xcconfig"
-PRODUCT_BUNDLE_IDENTIFIER=com.exemplo.meuapp.dev
-```
-
-#### Debug-Prod.xcconfig
-
-```xcconfig
-#include "Debug.xcconfig"
-PRODUCT_BUNDLE_IDENTIFIER=com.exemplo.meuapp
-```
-
----
-
-## 7. Firebase por Flavor
-
-### Android
-
-```text
-android/app/src/dev/google-services.json
-android/app/src/prod/google-services.json
-```
-
-### iOS
-
-```text
-ios/Runner/GoogleService-Info-Dev.plist
-ios/Runner/GoogleService-Info-Prod.plist
-```
-
----
-
-## 8. Ícones por Flavor
-
-### Android
-
-```text
 android/app/src/dev/res/mipmap-*
+android/app/src/hml/res/mipmap-*
 android/app/src/prod/res/mipmap-*
+Baby Step 4 — iOS: Schemes
+
+Abrir ios/Runner.xcworkspace
+
+Product → Scheme → Manage Schemes
+
+Criar:
+
+Runner-Dev
+
+Runner-Hml
+
+Runner-Prod
+
+Baby Step 5 — iOS: Build Configurations + Bundle ID
+Criar .xcconfig
+
+Exemplo Debug-dev.xcconfig:
+
+#include "Debug.xcconfig"
+PRODUCT_BUNDLE_IDENTIFIER=com.suaempresa.seuapp.dev
+APP_DISPLAY_NAME=SeuApp DEV
+
+Criar também:
+
+Debug-hml / Debug-prod
+
+Release-dev / Release-hml / Release-prod
+
+Criar Build Configurations
+
+Debug-Dev / Debug-Hml / Debug-Prod
+
+Release-Dev / Release-Hml / Release-Prod
+
+Mapear Scheme → Config
+
+Runner-Dev → Debug-Dev / Release-Dev
+
+Runner-Hml → Debug-Hml / Release-Hml
+
+Runner-Prod → Debug-Prod / Release-Prod
+
+Baby Step 6 — iOS: Nome e ícone
+Nome
+
+No Info.plist:
+
+Bundle display name = $(APP_DISPLAY_NAME)
+Ícones
+
+Criar AppIcon por ambiente e definir no .xcconfig:
+
+ASSETCATALOG_COMPILER_APPICON_NAME=AppIconDev
+Baby Step 7 — Padronizar comandos
+Dev
+flutter run --flavor dev \
+  --dart-define=FLAVOR=dev \
+  --dart-define=BASE_URL=https://dev-api.seuapp.com
+Hml
+flutter run --flavor hml \
+  --dart-define=FLAVOR=hml \
+  --dart-define=BASE_URL=https://hml-api.seuapp.com
+Prod
+flutter run --flavor prod \
+  --dart-define=FLAVOR=prod \
+  --dart-define=BASE_URL=https://api.seuapp.com
+Baby Step 8 — Firebase por flavor (opcional, mas comum)
+Android
+android/app/src/dev/google-services.json
+android/app/src/hml/google-services.json
+android/app/src/prod/google-services.json
+iOS
+
+GoogleService-Info-Dev.plist
+
+GoogleService-Info-Hml.plist
+
+GoogleService-Info-Prod.plist
+Associar por Build Configuration.
+
+6. Boas práticas
+
+Flavor ≠ segurança
+
+Não confundir buildType (debug/release) com ambiente
+
+Padronizar scripts
+
+Usar flavors para identidade do app
+
+Usar feature flags para comportamento dinâmico
+
+7. Checklist final
+
+ App dev e prod instalam juntos
+
+ BundleId/ApplicationId diferentes
+
+ URLs corretas por ambiente
+
+ Firebase separado
+
+ CI consegue buildar cada flavor
+
+8. Modelo mental
+
+Flavor → identidade do app (nome, ícone, bundle, Firebase)
+
+dart-define → comportamento do app (URLs, flags, logs)
 ```
-
-### iOS
-
-- AppIcon diferente por configuração
-
----
-
-## 9. Alternativa: --dart-define
-
-```bash
-flutter run --dart-define=FLAVOR=dev --dart-define=BASE_URL=https://api-dev...
-```
-
-```dart
-const flavor = String.fromEnvironment('FLAVOR');
-```
-
----
-
-## 10. Comandos úteis
-
-### Build APK
-
-```bash
-flutter build apk --flavor dev -t lib/main_dev.dart
-flutter build apk --flavor prod -t lib/main_prod.dart
-```
-
-### Build iOS
-
-```bash
-flutter build ios --flavor prod -t lib/main_prod.dart
-```
-
----
-
-## 11. Erros comuns
-
-| Erro                       | Causa                      |
-| -------------------------- | -------------------------- |
-| assembleDevDebug not found | Flavor mal configurado     |
-| App sobrescreve outro      | Falta applicationIdSuffix  |
-| API errada                 | Esqueceu -t ou dart-define |
-
----
-
-## 12. Estratégia recomendada
-
-- **Dev local**: flavor dev
-- **Homologação**: flavor hml
-- **Produção**: flavor prod
-
-Combine:
-
-- `--flavor` → identidade nativa
-- `--dart-define` → comportamento
-
----
-
-## 13. Próximos passos sugeridos
-
-- CI/CD com flavors
-- Feature flags
-- Injeção de dependência
-- Modularização por ambiente
-
----
-
-✅ **Este markdown pode ser usado como material de estudo, documentação interna ou base para onboarding de time Flutter.**
