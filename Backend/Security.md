@@ -16,103 +16,6 @@ Os princípios de segurança para APIs REST no backend são fundamentais para ga
 
 - Verificação de permissões em cada recurso e ação.
 
-## **🧱 2. Validação de Entrada e Sanitização**
-
-### **Validação**
-
-- Verifique tipos, tamanhos e padrões dos dados recebidos.
-
-- Rejeite campos inesperados.
-
-### **Sanitização**
-
-- Previne **Injeção de SQL, NoSQL, XSS** etc.
-
-- Use ORM seguro (Hibernate, Sequelize, etc.) para evitar injeção direta.
-
-## **🔒 3. Uso de HTTPS**
-
-- **Obrigatório:** Nunca permita requisições HTTP em produção.
-
-- Certifique-se de que redirecionamentos para HTTPS estejam ativos.
-
-- Use **HSTS** para forçar comunicação segura nos navegadores.
-
-## **🧾 4. Controle de Erros e Logs Seguros**
-
-- **Não exponha stack traces** ou mensagens internas da aplicação.
-
-- Mensagens de erro devem ser genéricas para o cliente.
-
-- Logs devem ser monitorados, mas **nunca conter dados sensíveis** como senhas ou tokens.
-
-## **🕵️ 5. Proteção Contra Ataques Comuns**
-
-### **CSRF**
-
-- APIs REST normalmente usam tokens e não são vulneráveis, mas:
-  - Se usar cookies, habilite **SameSite** e CSRF Tokens.
-
-### **XSS**
-
-- Filtre qualquer saída que possa ser interpretada como HTML/JS.
-
-- Use bibliotecas de escape.
-
-### **Rate Limiting**
-
-- Implemente limites de requisições por IP/token.
-
-- Prevê ataques de força bruta e negação de serviço (DoS).
-
-### **CORS**
-
-- Configure corretamente os domínios permitidos no CORS.
-
-- Nunca use Access-Control-Allow-Origin: \* em produção com autenticação.
-
-## **🧮 6. Criptografia e Armazenamento Seguro**
-
-- Senhas: use algoritmos de hash seguros como bcrypt, argon2.
-
-- Dados sensíveis (ex: CPF, cartão): armazenar com criptografia simétrica (AES).
-
-- Tokens: armazenar com escopo e tempo de vida definidos, e protegidos de vazamentos.
-
-## **🗂️ 7. Versionamento e Controle de Recursos**
-
-- Use versionamento (/v1/api/...) para manter retrocompatibilidade.
-
-- Limite exposição de dados nos payloads (retorne apenas o necessário).
-
-## **🧰 8. Headers de Segurança**
-
-Configure headers como:
-
-- X-Content-Type-Options: nosniff
-
-- X-Frame-Options: DENY
-
-- Content-Security-Policy
-
-- X-XSS-Protection
-
-## **🧪 9. Testes e Monitoramento de Segurança**
-
-- Testes automatizados com **ZAP**, **OWASP Dependency Check**, etc.
-
-- Realize **pentests regulares**.
-
-- Ferramentas como **Snyk** para verificação de vulnerabilidades em dependências.
-
-## **📜 10. Documentação e Segurança da Documentação**
-
-- Documente a API (ex: Swagger), mas proteja endpoints sensíveis.
-
-- Nunca exponha tokens ou segredos no Swagger/OpenAPI sem autenticação adequada.
-
-# **🔐 1. Autenticação**
-
 Autenticação é o **processo de verificar a identidade** de quem está tentando acessar a API. Antes de qualquer permissão ou acesso ser concedido, é fundamental saber: **Quem é você?**
 
 ## **🧭 Por que a autenticação é crítica em APIs REST?**
@@ -233,7 +136,19 @@ Em uma API, diferente de uma aplicação web tradicional com interface gráfica,
 
 - **Aplicar limitações (rate limit, brute force protection).**
 
-# **🧱 2. Validação de Entrada e Sanitização**
+## **🧱 2. Validação de Entrada e Sanitização**
+
+### **Validação**
+
+- Verifique tipos, tamanhos e padrões dos dados recebidos.
+
+- Rejeite campos inesperados.
+
+### **Sanitização**
+
+- Previne **Injeção de SQL, NoSQL, XSS** etc.
+
+- Use ORM seguro (Hibernate, Sequelize, etc.) para evitar injeção direta.
 
 Esse princípio foca em **proteger a API contra dados maliciosos ou malformados**, garantindo que tudo o que entra seja seguro, coerente e controlado.
 
@@ -339,6 +254,14 @@ Sanitização é o processo de **limpar ou neutralizar dados** que possam conter
 
 - **Escape ou sanitize dados antes de exibir ou usar em templates.**
 
+
+## **🔒 3. Uso de HTTPS**
+
+- **Obrigatório:** Nunca permita requisições HTTP em produção.
+
+- Certifique-se de que redirecionamentos para HTTPS estejam ativos.
+
+- Use **HSTS** para forçar comunicação segura nos navegadores.
 # **🔒 3. Uso de HTTPS**
 
 O uso do **HTTPS (Hypertext Transfer Protocol Secure)** é a base da **segurança na comunicação** entre clientes e servidores em APIs REST. Ele protege os dados que trafegam entre as partes, impedindo que sejam interceptados, lidos ou alterados por terceiros.
@@ -413,7 +336,13 @@ Uma API lida frequentemente com:
 
 **HTTPS não substitui outros mecanismos de segurança.** Ele é apenas a fundação. Se os dados forem mal validados ou os tokens forem armazenados indevidamente no frontend, o uso de HTTPS por si só **não impede ataques.**
 
-# **🧾 4. Controle de Erros e Logs Seguros**
+## **🧾 4. Controle de Erros e Logs Seguros**
+
+- **Não exponha stack traces** ou mensagens internas da aplicação.
+
+- Mensagens de erro devem ser genéricas para o cliente.
+
+- Logs devem ser monitorados, mas **nunca conter dados sensíveis** como senhas ou tokens.
 
 Erros acontecem — sejam por falhas de código, entrada inválida ou problemas externos. O que diferencia uma API segura de uma vulnerável é **como ela lida com esses erros** e **como registra os eventos relevantes**, especialmente em produção.
 
@@ -539,7 +468,30 @@ Utilize códigos HTTP adequados:
 | Mensagens de erro com SQL ou código | Base para ataques de injeção      |
 | Logs acessíveis publicamente        | Vazamento de dados e rastreamento |
 
-# **🕵️ 5. Proteção Contra Ataques Comuns**
+## **🕵️ 5. Proteção Contra Ataques Comuns**
+
+### **CSRF**
+
+- APIs REST normalmente usam tokens e não são vulneráveis, mas:
+  - Se usar cookies, habilite **SameSite** e CSRF Tokens.
+
+### **XSS**
+
+- Filtre qualquer saída que possa ser interpretada como HTML/JS.
+
+- Use bibliotecas de escape.
+
+### **Rate Limiting**
+
+- Implemente limites de requisições por IP/token.
+
+- Prevê ataques de força bruta e negação de serviço (DoS).
+
+### **CORS**
+
+- Configure corretamente os domínios permitidos no CORS.
+
+- Nunca use Access-Control-Allow-Origin: \* em produção com autenticação.
 
 APIs públicas (ou mesmo privadas, se mal protegidas) estão expostas a diversos vetores de ataque. Muitos deles exploram falhas comuns como:
 
@@ -685,8 +637,13 @@ APIs públicas (ou mesmo privadas, se mal protegidas) estão expostas a diversos
 - Use **bibliotecas de segurança atualizadas**.
 
 - **Teste constantemente com ferramentas automatizadas (ex: OWASP ZAP, Burp Suite)**.
+## **🧮 6. Criptografia e Armazenamento Seguro**
 
-# **🧮 6. Criptografia e Armazenamento Seguro**
+- Senhas: use algoritmos de hash seguros como bcrypt, argon2.
+
+- Dados sensíveis (ex: CPF, cartão): armazenar com criptografia simétrica (AES).
+
+- Tokens: armazenar com escopo e tempo de vida definidos, e protegidos de vazamentos.
 
 Este princípio trata da **proteção dos dados em repouso** (armazenados) e da aplicação de **métodos criptográficos** para garantir que, mesmo que haja acesso indevido ao banco ou ao sistema de arquivos, os dados continuem **ilegíveis e protegidos**.
 
@@ -790,7 +747,11 @@ Para dados como CPF, número de cartão, nome completo, etc., o ideal é **usar 
 
 - Implemente **camadas de defesa**: criptografia + autenticação + logs + monitoramento.
 
-# **🗂️ 7. Versionamento e Controle de Recursos**
+## **🗂️ 7. Versionamento e Controle de Recursos**
+
+- Use versionamento (/v1/api/...) para manter retrocompatibilidade.
+
+- Limite exposição de dados nos payloads (retorne apenas o necessário).
 
 Este princípio trata de **como organizar os endpoints da API de forma segura, previsível e sustentável**, evitando:
 
@@ -945,7 +906,17 @@ Endpoints como /api/processaTudo ou /api/run/{query}:
 
 Esse princípio garante que a API possa crescer de forma controlada, **sem sacrificar segurança ou previsibilidade**.
 
-# **🧰 8. Headers de Segurança**
+## **🧰 8. Headers de Segurança**
+
+Configure headers como:
+
+- X-Content-Type-Options: nosniff
+
+- X-Frame-Options: DENY
+
+- Content-Security-Policy
+
+- X-XSS-Protection
 
 Os **HTTP Security Headers** são **camadas adicionais de proteção** que atuam no nível da comunicação entre cliente e servidor. Eles ajudam a:
 
@@ -1083,8 +1054,13 @@ Access-Control-Allow-Origin: https://meusite.com
 - Ajuste o CORS com base no uso real da API.
 
 - Considere ferramentas como **Helmet.js** (Node), **Spring Security Headers** (Java), ou configurações nativas em nginx/apache para aplicar esses headers de forma automática.
+## **🧪 9. Testes e Monitoramento de Segurança**
 
-# **🧪 9. Testes e Monitoramento de Segurança**
+- Testes automatizados com **ZAP**, **OWASP Dependency Check**, etc.
+
+- Realize **pentests regulares**.
+
+- Ferramentas como **Snyk** para verificação de vulnerabilidades em dependências.
 
 Não basta implementar segurança — é preciso **verificar continuamente se ela está de fato funcionando**, e monitorar **tentativas de violação, falhas de configuração ou novos riscos**.
 
@@ -1241,7 +1217,13 @@ Planejar → Implementar → Testar → Corrigir → Monitorar → Melhorar
 
 Esse princípio garante que a segurança da sua API **não se degrade com o tempo**, mesmo após novas versões ou integrações.
 
-# **📜 10. Documentação e Segurança da Documentação**
+
+
+## **📜 10. Documentação e Segurança da Documentação**
+
+- Documente a API (ex: Swagger), mas proteja endpoints sensíveis.
+
+- Nunca exponha tokens ou segredos no Swagger/OpenAPI sem autenticação adequada.
 
 Ter uma API bem documentada é essencial para **adoção, uso correto e manutenção**. No entanto, **a documentação também pode expor riscos de segurança** se for mal gerenciada.
 
